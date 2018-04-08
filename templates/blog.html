@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style="color:blue">Build A Blog</h1>
+
+{% for i in blogs %}
+    <h3>{{i.title}}</h3>
+    <p>{{i.content}}</p>
+    <hr>
+{% endfor %}
+
+{% endblock %}

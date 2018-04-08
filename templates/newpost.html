@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% for category, message in messages %}
+        <li class="{{category}}">{{message}}</li>
+    {% endfor %}
+{% endwith %}    
+
+<form action="/newpost" method="POST">
+    <label for="title">Title
+        <input type="text" name="title" />
+    </label>
+    <br>
+    <label for="content">Content
+        <textarea name="content"></textarea>
+    </label>
+    <input type="submit" />
+</form>
+{% endblock %}
