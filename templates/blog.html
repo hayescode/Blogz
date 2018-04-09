@@ -1,12 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 style="color:blue">Build A Blog</h1>
 
-{% for i in blogs %}
-    <h3>{{i.title}}</h3>
-    <p>{{i.content}}</p>
-    <hr>
-{% endfor %}
+{% if title %}
+    <h1 style="color:blue">{{title}}</h1>
+
+    {% for i in blogs %}
+        <a href="/blog?id={{i.id}}"><h3>{{i.title}}</h3></a>
+        <p>{{i.content}}</p>
+        <hr>
+    {% endfor %}
+{% else %}
+    {% for i in blogs %}
+        <h1 class="blog_title">{{i.title}}</h1>
+        <p>{{i.content}}</p>
+        <hr>
+    {% endfor %}
+{% endif %}
 
 {% endblock %}
+
+
+
+<!--if title exists
+    build a blog
+    list blogs
+    else:
+    single blog via GET request-->

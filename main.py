@@ -19,27 +19,33 @@ class Blog(db.Model):
 
 @app.route("/blog", methods=["POST", "GET"])
 def index():
+    blog_id = request.args.get("id")
+    if blog_id:
+        blog = Blog.query.filter_by(id=blog_id).all()
+        return render_template("blog.html",blogs=blog)
 
-    blogs = Blog.query.filter_by().all()
-
-    return render_template('blog.html',blogs=blogs)
+    else:
+        blogs = Blog.query.filter_by().all()    #gets all blogs
+        title = "Build A Blog"
+        return render_template('blog.html',blogs=blogs, title=title)    #removing title will break if/else in blog.html
 
 @app.route("/newpost", methods=["POST","GET"])
 def newpost():
-
-    if request.method == "POST":
+    if request.method == "POST":    #if submitting a new blog, validate.
         title = request.form["title"]
         content = request.form['content']
         if title == "" or content == "":
             flash("You must fill in a title and some content","error")
-            return render_template('newpost.html')
+            return render_template('newpost.html',title=title,content=content)
         else:
-            new_blog = Blog(title,content)
+            new_blog = Blog(title,content)  #if title/content is there, create blog
             db.session.add(new_blog)
-            db.session.commit()
-            return redirect("/blog")
-
-    else:
+            db.session.commit()     #add to db
+            this_blog = Blog.query.filter_by(title=title).all() #select blog we just added
+            blog_id = this_blog[0].id   #get the id of the blog we just added
+            blog_url = "blog?id=" + str(blog_id)    #concat into GET url
+            return redirect(blog_url)
+    else:   #if just trying to type a new blog, skip validation
         return render_template('newpost.html')
 
 if __name__ == "__main__":
