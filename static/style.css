@@ -1,6 +1,6 @@
 .blog_title {
     font-size: 40pt;
-    color: brown;
+    color: black;
     text-align: center;
 }
 
@@ -8,6 +8,7 @@
     color:red
 }
 
+/*start navigation menu*/
 ul {
     list-style-type: none;
     margin: 0;
@@ -35,3 +36,4 @@ li a:hover {
 body {
     background-color: lightgray;
 }
+/*end navigation menu*/
