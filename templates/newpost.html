@@ -11,19 +11,17 @@
 <form action="/newpost" method="POST">
     <table>
         <tr>
-            <label for="title">Title
-                <input type="text" name="title" value="{{title}}"/>
-            </label>
+            <td><label for="title">Title</label></td>
+            <td><input type="text" name="title" value="{{title}}"/></td>
         </tr>
         <br>
         <tr>
-            <label for="content">Content
-                <textarea name="content">{{content}}</textarea>
-            </label>
+            <td><label for="content">Content</label></td>
+            <td><textarea name="content">{{content}}</textarea></td>
         </tr>
         <br>
         <tr>
-            <input type="submit" />
+            <td><input type="submit" /></td>
         </tr>
     </table>
 </form>

@@ -36,4 +36,8 @@ li a:hover {
 body {
     background-color: lightgray;
 }
+
+.right-align {
+    float: right;
+}
 /*end navigation menu*/
