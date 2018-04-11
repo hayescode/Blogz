@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, flash
+from flask import Flask, request, redirect, render_template, flash, session
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -85,19 +85,38 @@ def signup():
         password = request.form["password"]
         verify = request.form["verify"]
 
+        blanks_error = ""
+        username_exists_error = ""
+        password_match_error = ""
+        length_error = ""
+
         existing_user = User.query.filter_by(username=username).first()
+
+        if username == "" or password == "" or verify =="":
+            blanks_error = "You must fill in all fields!"
+            return render_template("signup.html", blanks_error=blanks_error)
+
+        if len(username) < 3 or len(password) < 3:
+            length_error = "Username and password must be at least 3 characters"
+            return render_template("signup.html", length_error=length_error)
+
+        if password != verify:
+            password_match_error = "Your passwords do not match!"
+            return render_template("signup.html", password_match_error=password_match_error)
+
+        if existing_user.username == username:
+            username_exists_error = "This username already exists!"
+            return render_template("signup.html", username_exists_error=username_exists_error)
 
         if not existing_user:
             new_user = User(username,password)
             db.session.add(new_user)
             db.session.commit()
             session['username'] = username
-            return redirect("/")
-        else:
-            #tell user they're already registered
-            return "<h1>Error! Already Registered!</h1>"
-            
-    return render_template("signup.html")
+            return redirect("/newpost")
+
+    else: #returns template if GET request (trying to sign up first time)
+        return render_template("signup.html")
 
 if __name__ == "__main__":
     app.run()
