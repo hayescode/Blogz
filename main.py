@@ -29,7 +29,7 @@ class User(db.Model):
         self.username = username
         self.password = password
 
-def logged_in_user():
+def logged_in_user():   #checks if a user is logged in. If so, it returns the username.
     try:
         logged_in_user = session["username"]
         return logged_in_user
@@ -37,7 +37,7 @@ def logged_in_user():
         return None
 
 @app.route("/blog", methods=["POST", "GET"])
-def index(): #fix this
+def index(): 
     blog_id = request.args.get("id")
     if blog_id:
         blog = Blog.query.filter_by(id=blog_id).all()
@@ -52,11 +52,12 @@ def newpost():
     if request.method == "POST":    #if submitting a new blog, validate.
         title = request.form["title"]
         content = request.form['content']
+        author = User.query.filter_by(username=logged_in_user()).first()
         if title == "" or content == "":
             flash("You must fill in a title and some content","error")
             return render_template('newpost.html',title=title,content=content, logged_in_user=logged_in_user())
         else:
-            new_blog = Blog(title,content)  #<---add author to this
+            new_blog = Blog(title,content,author)  #<---add author to this
             db.session.add(new_blog)
             db.session.commit()     #add to db
             this_blog = Blog.query.filter_by(title=title).all() #select blog we just added
