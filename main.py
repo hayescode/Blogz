@@ -62,24 +62,36 @@ def newpost():
 
 @app.route("/login", methods=["POST","GET"])
 def login():
-    #something
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
 
+        username_error = ""
+        bad_password_error = ""
+
         user = User.query.filter_by(username=username).first()
 
-        if user and user.password == password:
+        if not user:
+            username_error = "This username has not been registered!"
+            return render_template("login.html", username_error=username_error) 
+
+        if user.password != password:   #password is incorrect
+            bad_password_error = "You entered the wrong password!"
+            return render_template("login.html", username=username, bad_password_error=bad_password_error) 
+
+        if user and user.password == password:  #success! continue on to /newpost logged into session
             session['username'] = username
             flash("logged in")
-            return redirect("/")
+            return redirect("/newpost")
+        
+
         else:
             flash("user password incorrect, or user does not exist", "error")
             
     return render_template("login.html")
 
 @app.route("/signup", methods=["POST","GET"])
-def signup():
+def signup():   #registration functionality
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
