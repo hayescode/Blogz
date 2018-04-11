@@ -8,6 +8,23 @@
     color:red
 }
 
+#title {
+    text-align: center;
+    font-style: italic;
+    font-size: 32pt;
+}
+
+#logout {
+    border-left: 3px solid lightgray;
+}
+
+#logged_in {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
 /*start navigation menu*/
 ul {
     list-style-type: none;
@@ -32,7 +49,7 @@ li a {
 li a:hover {
     background-color: #111;
 }
-
+/*end navigation menu*/
 body {
     background-color: lightgray;
 }
@@ -40,4 +57,3 @@ body {
 .right-align {
     float: right;
 }
-/*end navigation menu*/

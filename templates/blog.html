@@ -3,7 +3,7 @@
 {% block content %}
 
 {% if title %}
-    <h1 style="color:blue">{{title}}</h1>
+    <h1 id="title">{{title}}</h1>
 
     {% for i in blogs %}
         <a href="/blog?id={{i.id}}"><h3>{{i.title}}</h3></a>

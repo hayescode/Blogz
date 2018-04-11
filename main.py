@@ -29,17 +29,23 @@ class User(db.Model):
         self.username = username
         self.password = password
 
+def logged_in_user():
+    try:
+        logged_in_user = session["username"]
+        return logged_in_user
+    except KeyError:
+        return None
+
 @app.route("/blog", methods=["POST", "GET"])
-def index():
+def index(): #fix this
     blog_id = request.args.get("id")
     if blog_id:
         blog = Blog.query.filter_by(id=blog_id).all()
-        return render_template("blog.html",blogs=blog)
-
+        return render_template("blog.html",blogs=blog, logged_in_user=logged_in_user())
     else:
-        blogs = Blog.query.filter_by().all()    #gets all blogs
-        title = "Build A Blog"
-        return render_template('blog.html',blogs=blogs, title=title)    #removing title will break if/else in blog.html
+        title = "Blogz"
+        blogs = Blog.query.filter_by().all()
+        return render_template("blog.html",blogs=blogs,title=title, logged_in_user=logged_in_user())
 
 @app.route("/newpost", methods=["POST","GET"])
 def newpost():
@@ -48,7 +54,7 @@ def newpost():
         content = request.form['content']
         if title == "" or content == "":
             flash("You must fill in a title and some content","error")
-            return render_template('newpost.html',title=title,content=content)
+            return render_template('newpost.html',title=title,content=content, logged_in_user=logged_in_user())
         else:
             new_blog = Blog(title,content)  #<---add author to this
             db.session.add(new_blog)
@@ -58,10 +64,10 @@ def newpost():
             blog_url = "blog?id=" + str(blog_id)    #concat into GET url
             return redirect(blog_url)
     else:   #if just trying to type a new blog, skip validation
-        return render_template('newpost.html')
+        return render_template('newpost.html', logged_in_user=logged_in_user())
 
 @app.route("/login", methods=["POST","GET"])
-def login():
+def login():    #login functionality
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -73,11 +79,11 @@ def login():
 
         if not user:
             username_error = "This username has not been registered!"
-            return render_template("login.html", username_error=username_error) 
+            return render_template("login.html", username_error=username_error, logged_in_user=logged_in_user()) 
 
         if user.password != password:   #password is incorrect
             bad_password_error = "You entered the wrong password!"
-            return render_template("login.html", username=username, bad_password_error=bad_password_error) 
+            return render_template("login.html", username=username, bad_password_error=bad_password_error, logged_in_user=logged_in_user()) 
 
         if user and user.password == password:  #success! continue on to /newpost logged into session
             session['username'] = username
@@ -88,7 +94,7 @@ def login():
         else:
             flash("user password incorrect, or user does not exist", "error")
             
-    return render_template("login.html")
+    return render_template("login.html", logged_in_user=logged_in_user())
 
 @app.route("/signup", methods=["POST","GET"])
 def signup():   #registration functionality
@@ -106,19 +112,19 @@ def signup():   #registration functionality
 
         if username == "" or password == "" or verify =="":
             blanks_error = "You must fill in all fields!"
-            return render_template("signup.html", blanks_error=blanks_error)
+            return render_template("signup.html", blanks_error=blanks_error, logged_in_user=logged_in_user())
 
         if len(username) < 3 or len(password) < 3:
             length_error = "Username and password must be at least 3 characters"
-            return render_template("signup.html", length_error=length_error)
+            return render_template("signup.html", length_error=length_error, logged_in_user=logged_in_user())
 
         if password != verify:
             password_match_error = "Your passwords do not match!"
-            return render_template("signup.html", password_match_error=password_match_error)
+            return render_template("signup.html", password_match_error=password_match_error, logged_in_user=logged_in_user())
 
         if existing_user.username == username:
             username_exists_error = "This username already exists!"
-            return render_template("signup.html", username_exists_error=username_exists_error)
+            return render_template("signup.html", username_exists_error=username_exists_error, logged_in_user=logged_in_user())
 
         if not existing_user:
             new_user = User(username,password)
@@ -128,7 +134,14 @@ def signup():   #registration functionality
             return redirect("/newpost")
 
     else: #returns template if GET request (trying to sign up first time)
-        return render_template("signup.html")
+        return render_template("signup.html", logged_in_user=logged_in_user())
+
+@app.route("/logout", methods=["POST","GET"])
+def logout():
+    del session["username"]
+    blogs = Blog.query.filter_by().all()    #gets all blogs
+    title = "Blogz"
+    return render_template('blog.html',blogs=blogs, title=title, logged_in_user=logged_in_user()) #removing title breaks if/else in blog.html
 
 if __name__ == "__main__":
     app.run()

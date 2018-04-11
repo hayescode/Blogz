@@ -2,12 +2,16 @@
 <html>
     <head>
         <title>Blogz</title>
-        <link type="text/css" rel="stylesheet" href="/static/style.css" />
+        <link type="text/css" rel="stylesheet" href="/static/style.css?version=59" />
     </head>
     <body>
         <ul>
-            <li><a href="/blog">Main Page Blog</a></li>
-            <li><a href="/newpost">Add a New Blog Entry</a></li>
+            <li><a href="/blog">Main Page</a></li>
+            <li><a href="/newpost">Add a New Blog</a></li>
+            {% if logged_in_user %}
+            <li id="logged_in">Logged in: {{logged_in_user}}</li>
+            {% endif %}
+            <li class="right-align"  id="logout"><a href="logout">Logout</a></li>
             <li class="right-align"><a href="/signup">Sign up</a></li>
             <li class="right-align"><a href="/login">Login</a></li>
         </ul>
