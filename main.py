@@ -36,8 +36,17 @@ def logged_in_user():   #checks if a user is logged in. If so, it returns the us
     except KeyError:
         return None
 
+@app.before_request
+def require_login():
+    allowed_routes = ["login","index","list_blogs","signup"]
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/login')
+
+@app.route("/")
+def home():
+    return render_template("index.html", logged_in_user=logged_in_user())
 @app.route("/blog", methods=["POST", "GET"])
-def index(): 
+def list_blogs(): 
     blog_id = request.args.get("id")
     if blog_id:
         blog = Blog.query.filter_by(id=blog_id).all()
@@ -123,16 +132,16 @@ def signup():   #registration functionality
             password_match_error = "Your passwords do not match!"
             return render_template("signup.html", password_match_error=password_match_error, logged_in_user=logged_in_user())
 
-        if existing_user.username == username:
-            username_exists_error = "This username already exists!"
-            return render_template("signup.html", username_exists_error=username_exists_error, logged_in_user=logged_in_user())
-
         if not existing_user:
             new_user = User(username,password)
             db.session.add(new_user)
             db.session.commit()
             session['username'] = username
             return redirect("/newpost")
+
+        if existing_user.username == username:
+            username_exists_error = "This username already exists!"
+            return render_template("signup.html", username_exists_error=username_exists_error, logged_in_user=logged_in_user())
 
     else: #returns template if GET request (trying to sign up first time)
         return render_template("signup.html", logged_in_user=logged_in_user())
