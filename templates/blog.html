@@ -2,28 +2,33 @@
 
 {% block content %}
 
-{% if title %}
+{% if title %}  <!--if there is no GET request, display all blogs for all users-->
     <h1 id="title">{{title}}</h1>
 
     {% for i in blogs %}
         <a href="/blog?id={{i.id}}"><h3>{{i.title}}</h3></a>
         <p>{{i.content}}</p>
+        <p class="written_by">written by: <a href="/blog?user={{i.author.username}}">{{i.author.username}}</a></p>
         <hr>
     {% endfor %}
-{% else %}
+
+{% elif author_blogs%}  <!--if there is a ?user= GET request, display all blogs from that user-->
+    {% for i in author_blogs %}
+        <a href="/blog?id={{i.id}}"><h3>{{i.title}}</h3></a>
+        <p>{{i.content}}</p>
+        <p class="written_by">written by: <a href="/blog?user={{username}}">{{username}}</a></p>
+        <hr>
+    {% endfor %}
+
+{% else %}  <!--if there is an ?id= GET request, display the blog batching that id number-->
     {% for i in blogs %}
         <h1 class="blog_title">{{i.title}}</h1>
         <p>{{i.content}}</p>
+        <p class="written_by">written by: <a href="/blog?user={{i.author.username}}">{{i.author.username}}</a></p>
         <hr>
     {% endfor %}
 {% endif %}
 
+{{test}}
+
 {% endblock %}
-
-
-
-<!--if title exists
-    build a blog
-    list blogs
-    else:
-    single blog via GET request-->

@@ -29,6 +29,12 @@ class User(db.Model):
         self.username = username
         self.password = password
 
+@app.before_request
+def require_login():
+    allowed_routes = ["login","index","list_blogs","signup"]
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/login')
+
 def logged_in_user():   #checks if a user is logged in. If so, it returns the username.
     try:
         logged_in_user = session["username"]
@@ -36,22 +42,24 @@ def logged_in_user():   #checks if a user is logged in. If so, it returns the us
     except KeyError:
         return None
 
-@app.before_request
-def require_login():
-    allowed_routes = ["login","index","list_blogs","signup"]
-    if request.endpoint not in allowed_routes and 'username' not in session:
-        return redirect('/login')
-
 @app.route("/")
-def home():
-    return render_template("index.html", logged_in_user=logged_in_user())
+def index():
+    authors = User.query.filter_by().all()
+    return render_template("index.html", logged_in_user=logged_in_user(),authors=authors)
+    
 @app.route("/blog", methods=["POST", "GET"])
 def list_blogs(): 
     blog_id = request.args.get("id")
-    if blog_id:
+    username = request.args.get("user")
+    if blog_id: #if there is a ?id= GET request
         blog = Blog.query.filter_by(id=blog_id).all()
         return render_template("blog.html",blogs=blog, logged_in_user=logged_in_user())
-    else:
+    elif username:  #if there is a ?user- GET request, return all blogs written by that user
+        user = User.query.filter_by(username=username).first()
+        user_id = user.id
+        author_blogs = Blog.query.filter_by(author_id=user_id).all()
+        return render_template("blog.html",username=username, author_blogs=author_blogs)
+    else:   #if there is no GET request, return all blogs written by all users
         title = "Blogz"
         blogs = Blog.query.filter_by().all()
         return render_template("blog.html",blogs=blogs,title=title, logged_in_user=logged_in_user())
@@ -66,7 +74,7 @@ def newpost():
             flash("You must fill in a title and some content","error")
             return render_template('newpost.html',title=title,content=content, logged_in_user=logged_in_user())
         else:
-            new_blog = Blog(title,content,author)  #<---add author to this
+            new_blog = Blog(title,content,author)
             db.session.add(new_blog)
             db.session.commit()     #add to db
             this_blog = Blog.query.filter_by(title=title).all() #select blog we just added
@@ -97,7 +105,6 @@ def login():    #login functionality
 
         if user and user.password == password:  #success! continue on to /newpost logged into session
             session['username'] = username
-            flash("logged in")
             return redirect("/newpost")
         
 

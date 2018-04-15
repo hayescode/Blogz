@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <h1>Authors</h1>
+    {% for i in authors %}
+        <a href="/blog?user={{i.username}}"><p>{{i.username}}</p></a>
+    {% endfor %}
 
 {% endblock %}
